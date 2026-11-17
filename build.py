@@ -541,6 +541,7 @@ def write_ics(path: Path, name: str, sessions: list[Session], cfg: dict, stamp: 
         if s.locatie:
             L.append(f"LOCATION:{ics_escape(s.locatie)}")
         L.append(f"CATEGORIES:{ics_escape(serie['naam'])}")
+        L += [f"X-RK-SERIE:{s.serie}", f"X-RK-SOORT:{s.categorie}"]   # voor de persoonlijke agenda (worker.js)
         if not s.hele_dag and not s.tbc:
             for m in alarms.get(s.categorie, []) or []:
                 L += ["BEGIN:VALARM", "ACTION:DISPLAY", f"DESCRIPTION:{ics_escape(title)}",
