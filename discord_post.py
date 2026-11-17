@@ -25,6 +25,7 @@ DAGEN = ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "
 MAANDEN = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus",
            "september", "oktober", "november", "december"]
 MAX_DESC, MAX_MSG, MAX_EMBEDS = 3900, 5500, 10
+LAND = "nl"   # wordt gezet vanuit config.yaml → discord: land
 
 
 def dag_naam(d: date) -> str:
@@ -33,7 +34,7 @@ def dag_naam(d: date) -> str:
 
 def regel(s: dict, series: dict, start: datetime | None) -> str:
     se = series.get(s["serie"], {"naam": s["serie"], "zender": {"kort": "?"}})
-    zender = se["zender"]["kort"]
+    zender = (se.get("zender_be") if LAND == "be" and se.get("zender_be") else se["zender"])["kort"]
     if s["hele_dag"]:
         eind = date.fromisoformat(s["eind"]) - timedelta(days=1)
         tm = f" t/m {DAGEN[eind.weekday()][:2].lower()} {eind.day} {MAANDEN[eind.month - 1][:3]}" if eind.isoformat() != s["start"] else ""
@@ -126,6 +127,8 @@ def main() -> int:
     data = json.loads(Path(a.data).read_text("utf-8"))
     cfg = yaml.safe_load(Path(a.config).read_text("utf-8"))
     nu = datetime.fromisoformat(a.nu) if a.nu else datetime.now(timezone.utc)
+    global LAND
+    LAND = str((cfg.get("discord") or {}).get("land", "nl")).lower()
     berichten = bouw_berichten(data, cfg, a.mode, nu)
     if not berichten:
         print("Niets te melden – geen bericht geplaatst.", file=sys.stderr)

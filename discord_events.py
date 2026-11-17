@@ -73,7 +73,9 @@ def gewenst(data: dict, cfg: dict, nu: datetime) -> dict[str, dict]:
         start, eind = dt(s["start"]), dt(s["eind"])
         if not (nu + timedelta(minutes=10) < start <= tot):
             continue
-        se = data["series"][s["serie"]]
+        se = dict(data["series"][s["serie"]])
+        if str((cfg.get("discord") or {}).get("land", "nl")).lower() == "be" and se.get("zender_be"):
+            se["zender"] = se["zender_be"]
         desc = f"📺 {se['zender']['info']}"
         if s.get("klassen"):
             desc += f"\n🏎️ {s['klassen']}"

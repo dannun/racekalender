@@ -505,7 +505,13 @@ def fold(line: str) -> str:
     return "\r\n ".join(parts)
 
 
-def write_ics(path: Path, name: str, sessions: list[Session], cfg: dict, stamp: str) -> None:
+def zender_van(cfg: dict, serie: dict, land: str = "nl") -> dict:
+    """Zender voor Nederland ('zender') of België ('zender_be') uit config.yaml."""
+    key = serie.get("zender_be", "onbekend") if land == "be" else serie.get("zender", "onbekend")
+    return cfg["zenders"].get(key, cfg["zenders"]["onbekend"])
+
+
+def write_ics(path: Path, name: str, sessions: list[Session], cfg: dict, stamp: str, land: str = "nl") -> None:
     fmt = cfg.get("titel_formaat", "{serie} · {sessie} · {evenement} [{zender}]")
     alarms = cfg.get("meldingen", {})
     L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//racekalender//NL", "CALSCALE:GREGORIAN",
@@ -513,7 +519,7 @@ def write_ics(path: Path, name: str, sessions: list[Session], cfg: dict, stamp: 
          "REFRESH-INTERVAL;VALUE=DURATION:PT6H", "X-PUBLISHED-TTL:PT6H"]
     for s in sessions:
         serie = cfg["series"][s.serie]
-        zender = cfg["zenders"].get(serie.get("zender", "onbekend"), cfg["zenders"]["onbekend"])
+        zender = zender_van(cfg, serie, land)
         sessie = s.sessie + (" (tijd volgt)" if s.tbc and not s.hele_dag else "")
         title = fmt.format(serie=serie["naam"], sessie=sessie, evenement=s.evenement, zender=zender["kort"])
         desc = f"📺 {zender['info']}"
@@ -570,20 +576,26 @@ def main() -> int:
     title = cfg.get("titel", "Racekalender")
     active = [k for k, s in cfg["series"].items() if s.get("aan", True) is not False]
 
-    write_ics(out / "alles.ics", title, sessions, cfg, stamp)
-    write_ics(out / "races.ics", f"{title} – races", [s for s in sessions if s.categorie in ("race", "sprint", "weekend")], cfg, stamp)
-    for k in active:
-        sub = [s for s in sessions if s.serie == k]
-        if sub:
-            write_ics(out / "ics" / f"{k}.ics", f"{cfg['series'][k]['naam']} ({title})", sub, cfg, stamp)
+    races = [s for s in sessions if s.categorie in ("race", "sprint", "weekend")]
+    (out / "ics" / "be").mkdir(parents=True, exist_ok=True)
+    for land, suf, map_ in (("nl", "", "ics"), ("be", "-be", "ics/be")):
+        extra = " (BE)" if land == "be" else ""
+        write_ics(out / f"alles{suf}.ics", title + extra, sessions, cfg, stamp, land)
+        write_ics(out / f"races{suf}.ics", f"{title} – races{extra}", races, cfg, stamp, land)
+        for k in active:
+            sub = [s for s in sessions if s.serie == k]
+            if sub:
+                write_ics(out / map_ / f"{k}.ics", f"{cfg['series'][k]['naam']} ({title}{extra})", sub, cfg, stamp, land)
 
     data = {
         "titel": title,
         "bijgewerkt": now.isoformat(timespec="seconds"),
         "tijdzone": cfg.get("tijdzone", "Europe/Amsterdam"),
         "series": {k: {"naam": cfg["series"][k]["naam"], "kleur": cfg["series"][k].get("kleur", "#888"),
-                       "zender": cfg["zenders"].get(cfg["series"][k].get("zender", "onbekend"), cfg["zenders"]["onbekend"]),
-                       "ics": f"ics/{k}.ics" if any(s.serie == k for s in sessions) else None}
+                       "zender": zender_van(cfg, cfg["series"][k], "nl"),
+                       "zender_be": zender_van(cfg, cfg["series"][k], "be"),
+                       "ics": f"ics/{k}.ics" if any(s.serie == k for s in sessions) else None,
+                       "ics_be": f"ics/be/{k}.ics" if any(s.serie == k for s in sessions) else None}
                    for k in active},
         "sessies": [{k: v for k, v in asdict(s).items() if v not in (None, "", False) or k in ("hele_dag",)}
                     for s in sessions],

@@ -37,6 +37,19 @@ zenders:
   wsbk:        { kort: Viaplay / SBK VideoPass, info: "Viaplay (Viaplay TV+ / Viaplay-app) of de WorldSBK VideoPass via worldsbk.com en de WorldSBK-app" }
   rallytv:     { kort: Rally.TV,       info: "Rally.TV (streamingdienst van de WRC)" }
   iracing:     { kort: iRacing,        info: "Officieel iRacing Special Event – meedoen in iRacing. Grote events worden vaak uitgezonden op het iRacing YouTube/Twitch-kanaal." }
+  # ── België ──
+  be_playsports:   { kort: Play Sports / Tipik, info: "Play Sports (Telenet, Nederlandstalig) of RTBF Tipik / Auvio (Franstalig, gratis). Ook F1 TV Pro." }
+  be_playsports2:  { kort: Play Sports / F1 TV, info: "Play Sports (Telenet) of F1 TV Pro" }
+  be_motogp:       { kort: Play Sports / Tipik, info: "Play Sports (Telenet, Nederlandstalig) of RTBF Tipik / Auvio (Franstalig, gratis)" }
+  be_fe:           { kort: Play Sports / Eurosport, info: "Play Sports (Telenet) of Eurosport / HBO Max" }
+  be_wec:          { kort: Eurosport / FIA WEC+, info: "Eurosport (ook via HBO Max) of de eigen streamingdienst FIA WEC+" }
+  be_wrc:          { kort: RTBF Auvio / Rally.TV, info: "RTBF Auvio (Franstalig, gratis) of Rally.TV" }
+  be_wsbk:         { kort: RTBF Auvio / SBK VideoPass, info: "RTBF Auvio (Franstalig) of de WorldSBK VideoPass via worldsbk.com en de WorldSBK-app" }
+  be_nascar:       { kort: ABXplore, info: "ABXplore (Franstalig) of NASCAR-streams via nascar.com" }
+  be_indycar:      { kort: IndyCar Live, info: "IndyCar Live (eigen streamingdienst van IndyCar) – geen vaste Belgische tv-zender bekend" }
+  be_imsa:         { kort: IMSA.tv, info: "IMSA-livestream via imsa.tv / YouTube – geen vaste Belgische tv-zender bekend" }
+  be_dtm:          { kort: DTM-stream, info: "DTM-livestream via dtm.com / YouTube – geen vaste Belgische tv-zender bekend" }
+  be_n24:          { kort: 24h-stream, info: "Gratis livestream van de 24h Nürburgring via YouTube – geen vaste Belgische tv-zender bekend" }
   onbekend:    { kort: "zender ?",     info: "Zender onbekend – vul aan in config.yaml" }
 
 # ─────────────────────────────────────────────────────────────
@@ -58,6 +71,7 @@ series:
     naam: F1
     kleur: "#e10600"
     zender: viaplay          # ✔
+    zender_be: be_playsports
     bronnen:
       - { type: sportstimes, sleutel: f1 }
       - { type: motorcal, sleutel: f1 }
@@ -65,6 +79,7 @@ series:
     naam: F2
     kleur: "#0090d0"
     zender: viaplay_f2       # ?
+    zender_be: be_playsports2
     bronnen:
       - { type: sportstimes, sleutel: f2 }
       - { type: mst, ics: "https://www.motorsport-total.com/motorsport-termine/termine_formelsport.ics", prefix: "Formel 2" }
@@ -72,6 +87,7 @@ series:
     naam: F3
     kleur: "#e46c0a"
     zender: viaplay_f2       # ?
+    zender_be: be_playsports2
     bronnen:
       - { type: sportstimes, sleutel: f3 }
       - { type: mst, ics: "https://www.motorsport-total.com/motorsport-termine/termine_formelsport.ics", prefix: "Formel 3" }
@@ -79,6 +95,7 @@ series:
     naam: F1 Academy
     kleur: "#d4479b"
     zender: viaplay_f2       # ?
+    zender_be: be_playsports2
     aan: false               # zet op true om mee te nemen
     bronnen:
       - { type: sportstimes, sleutel: f1-academy }
@@ -87,6 +104,7 @@ series:
     naam: MotoGP
     kleur: "#c80815"
     zender: ziggo            # ✔ (ook Moto2/Moto3, t/m 2029)
+    zender_be: be_motogp
     bronnen:
       - { type: sportstimes, sleutel: motogp }
       - { type: mst, pagina: motogp }
@@ -94,6 +112,7 @@ series:
     naam: Moto2
     kleur: "#8c1d18"
     zender: ziggo            # ✔
+    zender_be: be_motogp
     aan: false               # zelfde weekenden als MotoGP, bron heeft geen sessietijden
     bronnen:
       - { type: mst, pagina: moto2 }
@@ -101,6 +120,7 @@ series:
     naam: Moto3
     kleur: "#a83a2f"
     zender: ziggo            # ✔
+    zender_be: be_motogp
     aan: false               # zelfde weekenden als MotoGP, bron heeft geen sessietijden
     bronnen:
       - { type: mst, pagina: moto3 }
@@ -108,12 +128,14 @@ series:
     naam: WorldSBK
     kleur: "#7a1fa2"
     zender: wsbk             # ✔ (Viaplay heeft de NL-rechten in 2026)
+    zender_be: be_wsbk
     bronnen:
       - { type: mst, ics: "https://www.motorsport-total.com/motorsport-termine/termine_superbike-wm.ics" }
   wec:
     naam: WEC
     kleur: "#1f4e9e"
     zender: eurosport        # ✔ (Le Mans volgens Ziggo.nl)
+    zender_be: be_wec
     bronnen:
       - { type: motorcal, sleutel: wec }
       - { type: mst, pagina: wec }
@@ -121,30 +143,35 @@ series:
     naam: ELMS
     kleur: "#2a7d8c"
     zender: youtube_elms     # ?
+    zender_be: youtube_elms
     bronnen:
       - { type: mst, pagina: european-le-mans-series }
   n24:
     naam: 24h Nürburgring
     kleur: "#3c8d2f"
     zender: viaplay_n24      # ✔
+    zender_be: be_n24
     bronnen:
       - { type: mst, pagina: 24-stunden-vom-nuerburgring }
   imsa:
     naam: IMSA
     kleur: "#4b6b8a"
     zender: ziggo            # ✔ (t/m 2027)
+    zender_be: be_imsa
     bronnen:
       - { type: motorcal, sleutel: imsa }
   gtwc:
     naam: GTWC
     kleur: "#d9a400"
     zender: youtube_gt       # ?
+    zender_be: youtube_gt
     bronnen:
       - { type: mst, pagina: gt-world-challenge }
   indycar:
     naam: IndyCar
     kleur: "#1b3d8f"
     zender: ziggo            # ✔ (t/m 2029)
+    zender_be: be_indycar
     bronnen:
       - { type: sportstimes, sleutel: indycar }
       - { type: motorcal, sleutel: indycar }
@@ -152,12 +179,14 @@ series:
     naam: NASCAR
     kleur: "#ffd200"
     zender: ziggo            # ✔ (t/m 2029)
+    zender_be: be_nascar
     bronnen:
       - { type: mst, pagina: nascar }
   fe:
     naam: Formula E
     kleur: "#00a3e0"
     zender: ziggo            # ✔
+    zender_be: be_fe
     bronnen:
       - { type: sportstimes, sleutel: fe }
       - { type: mst, ics: "https://www.motorsport-total.com/motorsport-termine/termine_formelsport.ics", prefix: "Formel E" }
@@ -165,18 +194,21 @@ series:
     naam: DTM
     kleur: "#b0b7bf"
     zender: ziggo            # ✔
+    zender_be: be_dtm
     bronnen:
       - { type: mst, pagina: dtm }
   wrc:
     naam: WRC
     kleur: "#ef7d00"
     zender: rallytv          # ?
+    zender_be: be_wrc
     bronnen:
       - { type: mst, pagina: wrc }
   iracing:
     naam: iRacing Special Events
     kleur: "#0a3d8f"
     zender: iracing
+    zender_be: iracing
     bronnen:
       # datums automatisch van iracing.com, aangevuld met klassen/tijden uit data/iracing.yaml
       - { type: iracing, url: "https://www.iracing.com/specialevents/", bestand: data/iracing.yaml }
@@ -187,6 +219,7 @@ series:
 # ─────────────────────────────────────────────────────────────
 discord:
   naam: Racekalender                 # afzendernaam in Discord
+  land: nl                           # nl of be: welke zenders in Discord-berichten en -evenementen
   kop_week: "🏁 **Races deze week**"
   kop_dag: "🏁 **Races vandaag**"
   link: ""                           # optioneel: URL van je web-app onder de kop
