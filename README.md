@@ -1,96 +1,163 @@
 # Racekalender
 
-Een gratis "RaceDay" voor eigen gebruik. Je krijgt alle sessietijden van de grote raceklassen in Nederlandse tijd, met de NL-zender erbij:
+Een gratis alternatief voor apps als RaceDay. Alle grote raceklassen staan erin, met sessietijden in Nederlandse tijd en de tv-zender voor **Nederland of België**. Er zijn drie manieren om hem te gebruiken:
 
-- **Agenda-feeds (.ics)** voor de Agenda-app op je iPhone, Mac en Watch, met meldingen.
-- **Web-app** die je op je beginscherm zet: overzicht per dag, filter per serie en een aftelklok naar de volgende race.
+- **Web-app:** **https://dannun.github.io/racekalender/**. Je kunt hem als app op je beginscherm zetten.
+- **Agenda-abonnement:** werkt in iPhone/Mac, Android/Google en Outlook, met meldingen. Via *Mijn agenda* kies je zelf welke series erin staan.
+- **Discord:** een weekoverzicht en de races van de dag in een kanaal, en optioneel ook Discord-evenementen.
 
-Elke 6 uur wordt alles automatisch bijgewerkt via GitHub Actions. Dat is gratis, je hebt geen server nodig.
+Alles wordt elke 6 uur automatisch bijgewerkt via GitHub Actions, en direct na elke wijziging in de repo. Dat kost niets en er is geen eigen server nodig.
 
-## Installeren (± 5 minuten)
+---
 
-1. Maak op github.com een nieuwe **public** repository aan, bijvoorbeeld `racekalender`.
-2. Upload de inhoud van deze map, inclusief de map `.github`.
-   Via de terminal: `git init && git add . && git commit -m init && git branch -M main && git remote add origin https://github.com/<jij>/racekalender.git && git push -u origin main`
-3. Ga in de repo naar **Settings → Pages → Build and deployment → Source** en kies **GitHub Actions**.
-4. Open **Actions → Racekalender bijwerken → Run workflow**. Na ongeveer een minuut staat alles op
-   `https://<jij>.github.io/racekalender/`
+## Gebruiken
 
-> Een private repo werkt alleen met GitHub Pages als je een betaald account hebt. De feeds bevatten alleen openbare racetijden.
+### Web-app
+- Open **dannun.github.io/racekalender** in Safari of Chrome en kies **Delen → Zet op beginscherm**.
+- **Seriefilters:** tik bovenin op een serie om hem te verbergen of te tonen.
+- **Alles / Kwali + races / Races:** hiermee kies je welke sessies je ziet.
+- **NL / BE:** wisselt tussen Nederlandse en Belgische zenders. Een Belgisch toestel krijgt automatisch BE.
+- Tik op een sessie voor meer info: zender, klassen en notities.
 
-## Op je iPhone
+### Abonneren in je agenda
+Tik op **ABONNEER**:
+1. Kies je toestel: **iPhone / Mac**, **Android** of **Outlook**.
+2. Kies de **series** en de **sessies** (Alles, Kwali + races of Races).
+3. Tik op **ABONNEER · x SERIES**. Met *Link kopiëren* kopieer je de link om hem ergens anders te plakken.
 
-- **Web-app:** open de URL in Safari en kies **Deel → Zet op beginscherm**.
-- **Agenda:** tik in de web-app op **📅 Abonneer** en kies "Alles", "Alleen races" of één serie.
-  Meldingen staan al per type sessie in de feed (zie `config.yaml`). In iOS staan meldingen van een geabonneerde agenda soms standaard uit. Zet ze aan via **Agenda → Agenda's → (i) naast de racekalender**.
-- Wil je dat iOS vaker verversing ophaalt? Kies dan bij **Instellingen → Apps → Agenda → Accounts → Agenda-abonnementen → Haal op** de optie *elk uur*.
+Onder *Losse agenda's* staan ook kant-en-klare agenda's per serie.
 
-## Aanpassen: `config.yaml`
+**Wat gebeurt er bij wijzigingen?** Een abonnement is een live koppeling. Verschuift een tijd, dan schuift het item mee. Vervalt een sessie, dan verdwijnt hij, en nieuwe sessies verschijnen vanzelf. Hoe snel je dat ziet, hangt af van je agenda:
+
+| Agenda | Ververst |
+|---|---|
+| iPhone / Mac | instelbaar: Instellingen → Apps → Agenda → Accounts → **Haal op** → bijvoorbeeld *Elk uur* |
+| Google / Android | Google bepaalt het zelf, meestal binnen 8 tot 24 uur |
+| Outlook | een paar keer per dag |
+
+Items uit een abonnement kun je niet in je agenda aanpassen. Wijzigingen doe je in deze repo.
+
+---
+
+## Wat staat erin
+
+| Serie | Sessietijden | Zender NL | Zender BE | Bron |
+|---|---|---|---|---|
+| F1 | ✔ | Viaplay / F1 TV | Play Sports / Tipik / F1 TV | sportstimes |
+| F2, F3 | ✔ | Viaplay / F1 TV | Play Sports / F1 TV | sportstimes |
+| MotoGP | ✔ | Ziggo Sport | Play Sports / Tipik | sportstimes |
+| WEC (incl. Le Mans) | ✔ | Eurosport / FIA WEC+ | Eurosport / FIA WEC+ | motorcal |
+| IMSA | ✔ | Ziggo Sport | IMSA.tv | motorcal |
+| IndyCar | ✔ | Ziggo Sport | IndyCar Live | sportstimes / motorcal |
+| Formula E | ✔ | Ziggo Sport | Play Sports / Eurosport | sportstimes |
+| WorldSBK | weekend | Viaplay / SBK VideoPass | RTBF Auvio / SBK VideoPass | motorsport-total |
+| NASCAR | weekend | Ziggo Sport | ABXplore | motorsport-total |
+| DTM | weekend | Ziggo Sport | DTM-stream | motorsport-total |
+| WRC | weekend | Rally.TV | RTBF Auvio / Rally.TV | motorsport-total |
+| GT World Challenge | weekend | YouTube | YouTube | motorsport-total |
+| ELMS | weekend | YouTube | YouTube | motorsport-total |
+| 24h Nürburgring | weekend | Viaplay | 24h-stream | motorsport-total |
+| iRacing Special Events | datums + tijden | iRacing | iRacing | iracing.com + `data/iracing.yaml` |
+
+F1 Academy, Moto2 en Moto3 staan standaard uit (`aan: false` in `config.yaml`).
+
+**Weekend** betekent dat de bron alleen het raceweekend kent en geen starttijden. Komt er later een betere bron met tijden, dan schakelt het script vanzelf over. Volgend seizoen verschijnt ook vanzelf zodra de bronnen het publiceren.
+
+De zenders zijn per serie ingesteld, niet per race. Een gratis uitzending van één race staat er dus niet apart bij.
+
+---
+
+## Aanpassen
+
+Bijna alles regel je in **`config.yaml`**. Na een commit bouwt GitHub de kalender binnen ongeveer 2 minuten opnieuw.
 
 | Wat | Waar |
 |---|---|
-| Serie aan of uit | `aan: false` bij die serie |
-| Zender wijzigen of aanvullen | blok `zenders:` en per serie `zender:` |
-| Meldingen | `meldingen:` (minuten vooraf per race/sprint/kwalificatie/training) |
-| Titel in je agenda | `titel_formaat:` |
-| Serie toevoegen | nieuw blok onder `series:` met een `mst`- of `ics`-bron |
+| Serie aan of uit | `aan: false` bij de serie |
+| Zender Nederland | `zender:` bij de serie, verwijst naar het blok `zenders:` |
+| Zender België | `zender_be:` bij de serie, zie het blok `# ── België ──` |
+| Meldingen in de agenda | `meldingen:` (minuten vooraf per race, sprint, kwalificatie of training) |
+| Titel van agenda-items | `titel_formaat:` |
+| Discord | blok `discord:`, met `land: nl` of `be` |
+| Serie toevoegen | nieuw blok onder `series:` met een `mst`- of `ics`-bron (zie het commentaar in het bestand) |
 
-Zenders met `# ?` zijn niet nagekeken. Pas ze aan als je beter weet. Na elke push bouwt GitHub alles opnieuw.
+### iRacing Special Events
+De datums worden automatisch gelezen van [iracing.com/specialevents](https://www.iracing.com/specialevents/). Klassen, circuit en tijden komen uit **`data/iracing.yaml`**. Officiële tijden staan in het *This Week*-artikel van iRacing en in de event-thread op het forum, meestal pas in de week van het event. Per event kun je invullen:
 
-**Een serie van motorsport-total.com toevoegen:** open op motorsport-total.com de kalenderpagina van de serie. Het pad uit de URL, bijvoorbeeld `porsche-supercup`, gebruik je als `pagina:`. Je kunt ook de link achter "Kalender importieren" overnemen als `ics:`. Het script zet de gevonden link in het log.
+```yaml
+- naam: Chili Bowl
+  van: 2026-12-15
+  tot: 2026-12-20
+  circuit: Tulsa Expo
+  klassen: Dirt Midget
+  slots: [2026-12-19T22:00Z, ...]          # timeslots in UTC/GMT
+  sessies:                                   # of losse sessies per klasse
+    - { naam: "Super Session", tijd: 2026-12-20T02:00Z, klassen: "Dirt Midget" }
+  notitie: "tekst voor in de agenda"
+```
 
-## Databronnen
+Vul de 2027-kalender aan zodra iRacing die publiceert.
 
-| Bron | Series | Detail |
+---
+
+## Mijn agenda (Cloudflare Worker)
+
+GitHub Pages kan alleen vaste bestanden serveren. Daarom maakt een klein gratis script bij Cloudflare de persoonlijke agenda's:
+
+- Worker: **https://racekalender.dannun.workers.dev/**
+- Voorbeeld: `…workers.dev/mijn.ics?series=f1,motogp&soort=races&land=be`
+- Code: `cloudflare/worker.js`. Wijzig je die, plak hem dan opnieuw in Cloudflare (Workers & Pages → racekalender → Edit code → Deploy).
+- In `web/index.html` staat het adres bij `const WORKER`. Laat je dat leeg, dan verdwijnt *Mijn agenda* uit de app.
+- De worker bewaart de agenda 30 minuten in de cache. Na een update kan het dus even duren voordat Mijn agenda bij is.
+- De gratis limiet is 100.000 aanvragen per dag.
+
+---
+
+## Discord (optioneel)
+
+| Wat | Nodig | Bestand |
 |---|---|---|
-| [sportstimes/f1](https://github.com/sportstimes/f1) (f1calendar.com) | F1, F2, F3, F1 Academy, MotoGP, Formula E, IndyCar | alle sessietijden |
-| [motorcal](https://github.com/grahamwetzler/motorcal) | WEC (incl. Le Mans), IMSA, IndyCar | alle sessietijden |
-| [motorsport-total.com](https://www.motorsport-total.com/motorsport-termin-kalender) | WorldSBK, NASCAR, DTM, WRC, GTWC, ELMS, 24h Nürburgring + aanvulling volgend seizoen | alleen raceweekenden, zonder tijden |
+| **Link** vastpinnen in een kanaal | niets | – |
+| **Berichten:** maandag het weekoverzicht, andere dagen de races van vandaag | webhook | `discord_post.py` + `.github/workflows/discord.yml` |
+| **Evenementen** bovenaan de server (races en sprints, 14 dagen vooruit) | bot | `discord_events.py`, draait mee in `build.yml` |
 
-Per serie en per seizoen wordt de eerste bron gebruikt die data heeft. Komen de officiële tijden later beschikbaar bij een betere bron, dan schakelt het script vanzelf over.
+**Webhook:** Discord → Serverinstellingen → Integraties → Webhooks → Nieuwe webhook → URL kopiëren. Zet die in GitHub onder **Settings → Secrets and variables → Actions** als `DISCORD_WEBHOOK_URL`.
 
-**Beperkingen:** zenders zijn per serie ingesteld, niet per race. Afwijkingen zoals een gratis uitzending op Viaplay TV staan in de notitie van het agenda-item. Bij de series in de onderste rij zie je alleen het weekend, niet de starttijd.
+**Bot:** maak een bot op discord.com/developers/applications met de scope `bot` en het recht **Manage Events**, en voeg hem toe aan je server. Zet daarna de secrets `DISCORD_BOT_TOKEN` en `DISCORD_GUILD_ID` (Server-ID, via de Ontwikkelaarsmodus).
 
-## Op je eigen server in plaats van GitHub
+Zonder secrets slaan de scripts zichzelf over. Instellingen staan onder `discord:` in `config.yaml`. iRacing staat standaard niet bij de evenementen, omdat je anders vijf slots per event krijgt.
+
+---
+
+## Bestanden
+
+```
+.github/workflows/build.yml     bouwen + publiceren (elke 6 uur en na elke commit)
+.github/workflows/discord.yml   Discord-berichten (optioneel)
+build.py                        haalt de bronnen op en maakt de agenda's + races.json
+config.yaml                     series, zenders (NL/BE), meldingen, Discord
+data/iracing.yaml               iRacing-details: klassen, tijden, notities
+web/                            de web-app (index.html, iconen, manifest)
+cloudflare/worker.js            persoonlijke agenda (Mijn agenda)
+discord_post.py                 Discord-berichten via webhook
+discord_events.py               Discord-evenementen via bot
+```
+
+Wat de site publiceert: `index.html`, `races.json`, `alles.ics` / `races.ics` (NL), `alles-be.ics` / `races-be.ics` (BE), `ics/<serie>.ics` en `ics/be/<serie>.ics`.
+
+Lokaal testen:
 
 ```bash
 pip install pyyaml
-python build.py --out /var/www/racekalender     # of een IIS-map
-# cron: elke 6 uur
-17 */6 * * * cd /opt/racekalender && python3 build.py --out /var/www/racekalender
+python build.py --out public
+python discord_post.py --mode week --data public/races.json --dry-run
 ```
 
-Voor de agenda-abonnementen moet de map via **HTTPS** bereikbaar zijn voor je iPhone. Dat kan van buitenaf, of via je VPN als je alleen thuis/op VPN wilt syncen.
+## Databronnen
 
-## Discord
+- [sportstimes/f1](https://github.com/sportstimes/f1) (f1calendar.com en zustersites): F1, F2, F3, F1 Academy, MotoGP, Formula E, IndyCar
+- [motorcal](https://github.com/grahamwetzler/motorcal): WEC, IMSA, IndyCar
+- [motorsport-total.com](https://www.motorsport-total.com/motorsport-termin-kalender): raceweekenden van overige series (Duitse namen worden vertaald)
+- [iracing.com/specialevents](https://www.iracing.com/specialevents/): iRacing Special Events
 
-`discord_post.py` plaatst via een webhook een overzicht in een Discord-kanaal: op maandag de hele week, op de andere dagen de sessies van die dag (alleen als er iets is). Tijden staan als Discord-tijdstempel in het bericht, dus iedereen ziet zijn eigen lokale tijd.
-
-1. Discord: **Serverinstellingen → Integraties → Webhooks → Nieuwe webhook**, kies het kanaal en kopieer de webhook-URL.
-2. GitHub-repo: **Settings → Secrets and variables → Actions → New repository secret**, naam `DISCORD_WEBHOOK_URL`, waarde de URL.
-3. Testen: **Actions → Racekalender naar Discord → Run workflow** (kies `week`).
-
-Welke series en sessies in Discord komen stel je in onder `discord:` in `config.yaml`. De tijdstippen van plaatsen staan in `.github/workflows/discord.yml` (cron in UTC; in de zomer is dat een uur later NL-tijd).
-
-Zet de webhook-URL nooit in de repo zelf: iedereen met die URL kan in je kanaal posten.
-
-### Discord-evenementen (optioneel)
-
-`discord_events.py` zet races en sprints van de komende 14 dagen in de **Evenementen**-lijst van je server. Leden klikken op "Geïnteresseerd" en krijgen dan van Discord zelf een melding bij de start. Het script draait mee met de gewone update (elke 6 uur), werkt gewijzigde tijden bij en blijft van je eigen handmatige evenementen af.
-
-1. Ga naar discord.com/developers/applications → **New Application** → tabblad **Bot** → **Reset Token** en kopieer het token.
-2. Tabblad **OAuth2 → URL Generator**: vink scope `bot` aan en het recht **Manage Events**. Open de gegenereerde link en voeg de bot toe aan je server.
-3. Server-ID: zet in Discord **Instellingen → Geavanceerd → Ontwikkelaarsmodus** aan, klik rechts op je server → **Server-ID kopiëren**.
-4. Maak in GitHub twee secrets aan: `DISCORD_BOT_TOKEN` en `DISCORD_GUILD_ID`.
-
-Zonder deze secrets slaat het script zichzelf over. Instellingen staan onder `discord: evenementen:` in `config.yaml`. Lokaal bekijken wat er aangemaakt zou worden: `python discord_events.py --dry-run`.
-
-## iRacing Special Events
-
-Serie `iracing` in `config.yaml`. Het script leest de datums automatisch van [iracing.com/specialevents](https://www.iracing.com/specialevents/). Lukt dat niet, bijvoorbeeld omdat de pagina van opzet verandert, dan gebruikt het de lijst in `data/iracing.yaml` (staat in het Actions-log).
-
-iRacing publiceert alleen datums, geen starttijden. Wil je de timeslots in je agenda, zet ze dan per event in `data/iracing.yaml` onder `tijden:` (in GMT/UTC) en verwijder de `url`-bron in `config.yaml`, zodat de handmatige lijst voorrang krijgt.
-
-## Link in Discord
-
-Discord maakt van `webcal://`-links geen klikbare link. Deel daarom de **web-app-URL** (`https://<jij>.github.io/racekalender/`): daar staat de knop 📅 Abonneer. Zet hem in een vastgepinde post, in het kanaalonderwerp of onder `discord: link:` in `config.yaml`. Dan staat hij ook onder elk weekoverzicht.
+Racekalender is een eigen project en niet verbonden aan de genoemde series, zenders of bronnen.
