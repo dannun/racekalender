@@ -35,7 +35,7 @@ zenders:
   youtube_gt:  { kort: GT World (YouTube), info: "Gratis livestream op het GT World YouTube-kanaal" }
   youtube_elms: { kort: ELMS (YouTube), info: "Gratis livestream op het ELMS YouTube-kanaal" }
   rallytv:     { kort: Rally.TV,       info: "Rally.TV (streamingdienst van de WRC)" }
-  iracing:     { kort: iRacing,        info: "Sim racing – meedoen in iRacing. Grote events worden vaak uitgezonden op het iRacing YouTube/Twitch-kanaal." }
+  iracing:     { kort: iRacing,        info: "Officieel iRacing Special Event – meedoen in iRacing. Grote events worden vaak uitgezonden op het iRacing YouTube/Twitch-kanaal." }
   onbekend:    { kort: "zender ?",     info: "Zender onbekend – vul aan in config.yaml" }
 
 # ─────────────────────────────────────────────────────────────
@@ -173,7 +173,7 @@ series:
     bronnen:
       - { type: mst, pagina: wrc }
   iracing:
-    naam: iRacing
+    naam: iRacing Special Events
     kleur: "#0a3d8f"
     zender: iracing
     bronnen:
