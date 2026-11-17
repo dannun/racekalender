@@ -136,6 +136,9 @@
   .sub a { background: var(--accent); color: #0A0A0A; border-radius: 0; font-weight: 800; transform: skewX(var(--skew)); }
   footer button { font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
   footer { font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px; font-size: 14px; }
+  .plat { display: flex; gap: 6px; margin: 4px 0 10px; }
+  .plat button { flex: 1; font-size: 13px; padding: 7px 4px; }
+  .plat button.on { background: var(--accent); color: #0A0A0A; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -156,7 +159,10 @@
 <div class="sheet" id="sheet">
   <div class="box">
     <h2>Abonneren in Agenda</h2>
-    <p>Tik op een agenda: je iPhone voegt hem toe als abonnement en werkt hem automatisch bij. Meldingen per agenda zet je aan in de Agenda-app.</p>
+    <div class="plat" id="plat">
+      <button data-p="apple">iPhone / Mac</button><button data-p="google">Android</button><button data-p="outlook">Outlook</button>
+    </div>
+    <p id="platUitleg"></p>
     <div id="subs"></div>
     <button id="close" style="margin-top:12px;width:100%">Sluiten</button>
   </div>
@@ -264,12 +270,29 @@
   }
   let showAll = false;
 
+  const SITE = "https://dannun.github.io/racekalender/";   // adres van de site, voor als de pagina los geopend wordt
+  let platform = store.get("platform", /android/i.test(navigator.userAgent) ? "google" : /windows/i.test(navigator.userAgent) ? "outlook" : "apple");
+  const UITLEG = {
+    apple: "Tik op Abonneer: je iPhone of Mac voegt de agenda toe en werkt hem automatisch bij. Meldingen zet je per agenda aan in de Agenda-app.",
+    google: "Tik op Abonneer en kies 'Toevoegen' in Google Agenda. Op Android verschijnt hij daarna vanzelf; staat hij er niet, zet hem dan aan via Google Agenda → Instellingen → de agenda → Synchroniseren. Google ververst zelf, meestal een paar keer per dag.",
+    outlook: "Tik op Abonneer en kies 'Importeren' in Outlook (outlook.com / Microsoft 365). Werkt daarna ook in de Outlook-app op je telefoon.",
+  };
   function renderSubs() {
-    if (window.__RACEDATA__) { $("#subs").innerHTML = '<p>Dit is een voorbeeld. Abonneren werkt zodra de kalender op je eigen GitHub Pages-adres staat.</p>'; return; }
-    const base = new URL(".", location.href);
-    const web = p => base.protocol.startsWith("http") ? "webcal://" + new URL(p, base).href.replace(/^https?:\/\//, "") : p;
+    document.querySelectorAll("#plat button").forEach(b => b.classList.toggle("on", b.dataset.p === platform));
+    $("#platUitleg").textContent = UITLEG[platform];
+    // buiten de website (voorbeeld, los bestand) naar het vaste adres verwijzen
+    let base;
+    try { base = new URL(".", location.href); if (!/^https?:$/.test(base.protocol)) throw 0; }
+    catch { base = new URL(SITE); }
+    const link = (p, naam) => {
+      const https = new URL(p, base).href;
+      const webcal = "webcal://" + https.replace(/^https?:\/\//, "");
+      if (platform === "google") return "https://calendar.google.com/calendar/render?cid=" + encodeURIComponent(webcal);
+      if (platform === "outlook") return "https://outlook.live.com/calendar/0/addfromweb?url=" + encodeURIComponent(https) + "&name=" + encodeURIComponent(naam);
+      return webcal;
+    };
     const item = (title, sub, p) => `<div class="sub"><span>${esc(title)}<small>${esc(sub)}</small></span>
-      <span><button class="copy" data-url="${new URL(p, base).href}">kopieer</button> <a href="${web(p)}">Abonneer</a></span></div>`;
+      <span><button class="copy" data-url="${new URL(p, base).href}">kopieer</button> <a href="${link(p, "Racekalender – " + title)}"${platform === "apple" ? "" : ' target="_blank" rel="noopener"'}>Abonneer</a></span></div>`;
     let h = item("Alles", "alle series en sessies", "alles.ics") + item("Alleen races", "races, sprints en raceweekenden", "races.ics");
     for (const [k, s] of Object.entries(DATA.series)) if (s.ics) h += item(s.naam, "📺 " + s.zender.kort, s.ics);
     $("#subs").innerHTML = h;
@@ -282,6 +305,7 @@
     else if (t.matches("#seg button")) { filter = t.dataset.f; store.set("filter", filter); render(); }
     else if (t.id === "past") { showPast = !showPast; render(); }
     else if (t.id === "more") { showAll = true; render(); }
+    else if (t.matches("#plat button")) { platform = t.dataset.p; store.set("platform", platform); renderSubs(); }
     else if (t.id === "btnSub") { renderSubs(); $("#sheet").classList.add("on"); }
     else if (t.id === "close") $("#sheet").classList.remove("on");
     else if (t.matches(".copy")) { navigator.clipboard?.writeText(t.dataset.url).then(() => { t.textContent = "gekopieerd ✓"; }, () => {}); }
@@ -291,7 +315,8 @@
 
   function load(d) { DATA = d; DATA.sessies = d.sessies.map(parse); render(); setInterval(render, 60000); }
   if (window.__RACEDATA__) load(window.__RACEDATA__);
-  else fetch("races.json", { cache: "no-cache" }).then(r => r.json()).then(load)
+  else fetch("races.json", { cache: "no-cache" }).then(r => { if (!r.ok) throw 0; return r.json(); })
+    .catch(() => fetch(SITE + "races.json", { cache: "no-cache" }).then(r => r.json())).then(load)
     .catch(() => { $("#main").innerHTML = '<div class="empty">Kon races.json niet laden.</div>'; });
 })();
 </script>
