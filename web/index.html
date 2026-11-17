@@ -136,9 +136,6 @@
   .sub a { background: var(--accent); color: #0A0A0A; border-radius: 0; font-weight: 800; transform: skewX(var(--skew)); }
   footer button { font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
   footer { font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px; font-size: 14px; }
-  .plat { display: flex; gap: 6px; margin: 4px 0 10px; }
-  .plat button { flex: 1; font-size: 13px; padding: 7px 4px; }
-  .plat button.on { background: var(--accent); color: #0A0A0A; font-weight: 700; }
   #btnLand { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px;
     padding: 7px 12px; margin-right: 8px; transform: skewX(var(--skew)); background: var(--panel); border: 1px solid var(--line); }
   #btnLand.be { color: var(--accent); }
@@ -149,8 +146,28 @@
     #btnSub { font-size: 12px; padding: 8px 10px; }
     #btnLand { padding: 7px 9px; margin-right: 0; }
   }
-  .sub.mijn { border: 1px solid var(--accent); padding: 10px; margin-bottom: 8px; }
-  .sub.mijn small + small { opacity: .7; }
+  .sh-kop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .sh-kop h2 { margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 18px; }
+  #close { background: none; border: 0; font-size: 18px; color: var(--muted); padding: 4px 8px; }
+  .seg2 { display: flex; background: var(--panel2); padding: 3px; gap: 3px; margin-bottom: 14px; }
+  .seg2 button { flex: 1; background: none; border: 0; font-size: 13px; padding: 7px 4px; color: var(--muted); }
+  .seg2 button.on { background: var(--accent); color: #0A0A0A; font-weight: 700; }
+  .lbl { display: flex; justify-content: space-between; align-items: baseline; margin: 2px 0 8px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .lbl button { background: none; border: 0; padding: 0; color: var(--muted); font: inherit; letter-spacing: 1px; text-decoration: underline; }
+  .kies { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .kies button { font-size: 13px; padding: 6px 11px; background: var(--panel2); border: 0; color: var(--muted);
+    border-left: 3px solid transparent; }
+  .kies button.on { color: var(--text); background: #2c2c2c; border-left-color: var(--c); font-weight: 600; }
+  a.groot { display: block; text-align: center; background: var(--accent); color: #0A0A0A; text-decoration: none;
+    font-weight: 800; text-transform: uppercase; letter-spacing: .5px; padding: 13px; margin-top: 4px; }
+  a.groot.uit { background: var(--panel2); color: var(--muted); }
+  .onder { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .onder .copy { padding: 0; text-decoration: underline; }
+  .meer { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 10px; }
+  .meer summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+  .los { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .los a { display: inline-block; background: var(--accent); color: #0A0A0A; text-decoration: none; font-weight: 800; padding: 2px 10px; margin-left: 6px; }
 </style>
 </head>
 <body>
@@ -171,13 +188,8 @@
 
 <div class="sheet" id="sheet">
   <div class="box">
-    <h2>Abonneren in Agenda</h2>
-    <div class="plat" id="plat">
-      <button data-p="apple">iPhone / Mac</button><button data-p="google">Android</button><button data-p="outlook">Outlook</button>
-    </div>
-    <p id="platUitleg"></p>
+    <div class="sh-kop"><h2>Abonneren</h2><button id="close" aria-label="Sluiten">✕</button></div>
     <div id="subs"></div>
-    <button id="close" style="margin-top:12px;width:100%">Sluiten</button>
   </div>
 </div>
 
@@ -289,15 +301,7 @@
   const SITE = "https://dannun.github.io/racekalender/";     // adres van de site, voor als de pagina los geopend wordt
   const WORKER = "https://racekalender.dannun.workers.dev/"; // Cloudflare Worker voor 'Mijn agenda' – leeg = verbergen
   let platform = store.get("platform", /android/i.test(navigator.userAgent) ? "google" : /windows/i.test(navigator.userAgent) ? "outlook" : "apple");
-  const UITLEG = {
-    apple: "Tik op Abonneer: je iPhone of Mac voegt de agenda toe en werkt hem automatisch bij. Meldingen zet je per agenda aan in de Agenda-app.",
-    google: "Tik op Abonneer en kies 'Toevoegen' in Google Agenda. Op Android verschijnt hij daarna vanzelf; staat hij er niet, zet hem dan aan via Google Agenda → Instellingen → de agenda → Synchroniseren. Google ververst zelf, meestal een paar keer per dag.",
-    outlook: "Tik op Abonneer en kies 'Importeren' in Outlook (outlook.com / Microsoft 365). Werkt daarna ook in de Outlook-app op je telefoon.",
-  };
   function renderSubs() {
-    document.querySelectorAll("#plat button").forEach(b => b.classList.toggle("on", b.dataset.p === platform));
-    $("#platUitleg").textContent = UITLEG[platform];
-    // buiten de website (voorbeeld, los bestand) naar het vaste adres verwijzen
     let base;
     try { base = new URL(".", location.href); if (!/^https?:$/.test(base.protocol)) throw 0; }
     catch { base = new URL(SITE); }
@@ -308,21 +312,38 @@
       if (platform === "outlook") return "https://outlook.live.com/calendar/0/addfromweb?url=" + encodeURIComponent(https) + "&name=" + encodeURIComponent(naam);
       return webcal;
     };
-    const item = (title, sub, p) => `<div class="sub"><span>${esc(title)}<small>${esc(sub)}</small></span>
-      <span><button class="copy" data-url="${new URL(p, base).href}">kopieer</button> <a href="${link(p, "Racekalender – " + title)}"${platform === "apple" ? "" : ' target="_blank" rel="noopener"'}>Abonneer</a></span></div>`;
+    const doel = platform === "apple" ? "" : ' target="_blank" rel="noopener"';
     const be = land === "be", suf = be ? "-be" : "";
-    let h = `<p>Zenders voor <b>${be ? "België" : "Nederland"}</b> – wissel met de knop ${be ? "BE" : "NL"} bovenin.</p>`;
+    const seg = (attr, waarde, opties) => `<div class="seg2">${opties.map(([k, t]) =>
+      `<button ${attr}="${k}" class="${k === waarde ? "on" : ""}">${t}</button>`).join("")}</div>`;
+
+    let h = seg("data-p", platform, [["apple", "iPhone / Mac"], ["google", "Android"], ["outlook", "Outlook"]]);
+
+    const losse = [["Alles", `alles${suf}.ics`], ["Alleen races", `races${suf}.ics`],
+      ...Object.values(DATA.series).filter(x => be ? x.ics_be : x.ics).map(x => [x.naam, be ? x.ics_be : x.ics])];
+    const losHtml = losse.map(([t, f]) => `<div class="los"><span>${esc(t)}</span>
+      <span><button class="copy" data-url="${new URL(f, base).href}">link</button><a href="${link(f, "Racekalender – " + t)}"${doel}>+</a></span></div>`).join("");
+
     if (WORKER) {
-      const gekozen = Object.keys(DATA.series).filter(k => !hidden.has(k));
-      const q = new URLSearchParams({ series: gekozen.join(","), soort: filter, land });
-      const mijn = WORKER.replace(/\/?$/, "/") + "mijn.ics?" + q.toString();
-      const namen = gekozen.map(k => DATA.series[k].naam).join(", ");
-      const soortTxt = { alles: "alle sessies", kwali: "kwalificatie + races", races: "alleen races" }[filter];
-      h += `<div class="sub mijn"><span>⭐ Mijn agenda<small>${esc(namen)} · ${soortTxt}</small><small>Pas aan met de seriefilters en de knoppen Alles / Kwali / Races.</small></span>
-        <span><button class="copy" data-url="${esc(mijn)}">kopieer</button> <a href="${esc(link(mijn, "Mijn Racekalender"))}"${platform === "apple" ? "" : ' target="_blank" rel="noopener"'}>Abonneer</a></span></div>`;
+      const alle = Object.keys(DATA.series);
+      let sel = store.get("mijnSeries", null);
+      if (!Array.isArray(sel)) sel = alle.filter(k => !hidden.has(k));
+      sel = sel.filter(k => alle.includes(k));
+      const soort = store.get("mijnSoort", "kwali");
+      const mijn = WORKER.replace(/\/?$/, "/") + "mijn.ics?" + new URLSearchParams({ series: sel.join(","), soort, land });
+      h += `<div class="lbl"><span>Series</span><span><button data-mijnalles="1">alle</button> · <button data-mijnalles="0">geen</button></span></div>
+        <div class="kies">${alle.map(k => { const x = DATA.series[k], aan = sel.includes(k);
+          return `<button data-mijnserie="${k}" class="${aan ? "on" : ""}" style="--c:${x.kleur}">${esc(x.naam)}</button>`; }).join("")}</div>
+        <div class="lbl"><span>Sessies</span></div>
+        ${seg("data-mijnsoort", soort, [["alles", "Alles"], ["kwali", "Kwali + races"], ["races", "Races"]])}
+        ${sel.length
+          ? `<a class="groot" href="${esc(link(mijn, "Mijn Racekalender"))}"${doel}>Abonneer · ${sel.length} ${sel.length === 1 ? "serie" : "series"}</a>`
+          : `<a class="groot uit">Kies minstens één serie</a>`}
+        <div class="onder"><button class="copy" data-url="${esc(mijn)}">Link kopiëren</button><span>werkt zichzelf bij · zenders ${be ? "BE" : "NL"}</span></div>
+        <details class="meer"><summary>Losse agenda's</summary>${losHtml}</details>`;
+    } else {
+      h += losHtml;
     }
-    h += item("Alles", "alle series en sessies", `alles${suf}.ics`) + item("Alleen races", "races, sprints en raceweekenden", `races${suf}.ics`);
-    for (const [k, s] of Object.entries(DATA.series)) { const f = be ? s.ics_be : s.ics; if (f) h += item(s.naam, "📺 " + zd(s).kort, f); }
     $("#subs").innerHTML = h;
   }
 
@@ -333,7 +354,17 @@
     else if (t.matches("#seg button")) { filter = t.dataset.f; store.set("filter", filter); render(); }
     else if (t.id === "past") { showPast = !showPast; render(); }
     else if (t.id === "more") { showAll = true; render(); }
-    else if (t.matches("#plat button")) { platform = t.dataset.p; store.set("platform", platform); renderSubs(); }
+    else if (t.dataset.p) { platform = t.dataset.p; store.set("platform", platform); renderSubs(); }
+    else if (t.dataset.mijnserie) {
+      const alle = Object.keys(DATA.series);
+      let sel = store.get("mijnSeries", null);
+      if (!Array.isArray(sel)) sel = alle.filter(k => !hidden.has(k));
+      const k = t.dataset.mijnserie;
+      sel = sel.includes(k) ? sel.filter(x => x !== k) : [...sel, k];
+      store.set("mijnSeries", alle.filter(x => sel.includes(x))); renderSubs();
+    }
+    else if (t.dataset.mijnsoort) { store.set("mijnSoort", t.dataset.mijnsoort); renderSubs(); }
+    else if (t.dataset.mijnalles) { store.set("mijnSeries", t.dataset.mijnalles === "1" ? Object.keys(DATA.series) : []); renderSubs(); }
     else if (t.id === "btnLand") { land = land === "be" ? "nl" : "be"; store.set("land", land); zetLand(); render(); }
     else if (t.id === "btnSub") { renderSubs(); $("#sheet").classList.add("on"); }
     else if (t.id === "close") $("#sheet").classList.remove("on");
