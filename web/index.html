@@ -139,12 +139,23 @@
   .plat { display: flex; gap: 6px; margin: 4px 0 10px; }
   .plat button { flex: 1; font-size: 13px; padding: 7px 4px; }
   .plat button.on { background: var(--accent); color: #0A0A0A; font-weight: 700; }
+  #btnLand { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px;
+    padding: 7px 12px; margin-right: 8px; transform: skewX(var(--skew)); background: var(--panel); border: 1px solid var(--line); }
+  #btnLand.be { color: var(--accent); }
+  .top { gap: 8px; }
+  @media (max-width: 430px) {
+    h1 { font-size: 15px; letter-spacing: .5px; }
+    h1::before { width: 38px; height: 30px; font-size: 15px; margin-right: 8px; }
+    #btnSub { font-size: 12px; padding: 8px 10px; }
+    #btnLand { padding: 7px 9px; margin-right: 0; }
+  }
 </style>
 </head>
 <body>
 <header>
   <div class="top">
     <h1>Race<span>kalender</span></h1>
+    <button id="btnLand" title="Zenders voor Nederland of België">NL</button>
     <button id="btnSub">📅 Abonneer</button>
   </div>
   <div class="chips" id="chips"></div>
@@ -176,6 +187,9 @@
     get(k, d) { try { const v = localStorage.getItem("rk." + k); return v ? JSON.parse(v) : d; } catch { return d; } },
     set(k, v) { try { localStorage.setItem("rk." + k, JSON.stringify(v)); } catch {} }
   };
+  let land = store.get("land", /-BE$/i.test(navigator.language || "") ? "be" : "nl");
+  const zd = se => (land === "be" && se.zender_be) ? se.zender_be : (se.zender || { kort: "", info: "" });
+  function zetLand() { const b = document.getElementById("btnLand"); if (b) { b.textContent = land === "be" ? "BE" : "NL"; b.classList.toggle("be", land === "be"); } }
   let DATA, hidden = new Set(store.get("hidden", [])), filter = store.get("filter", "alles"), showPast = false;
 
   const fmt = (o) => new Intl.DateTimeFormat("nl-NL", { timeZone: TZ, ...o });
@@ -232,8 +246,8 @@
           ${live ? '<span class="live">LIVE</span>' : ""}</div>
         <div class="l2">${esc(s.evenement)}${s.locatie && s.locatie !== s.evenement ? " · " + esc(s.locatie) : ""}</div>
         ${s.klassen ? `<div class="cls">🏎️ ${esc(s.klassen)}</div>` : ""}
-        <div class="tv">📺 ${esc(se.zender.kort)}</div>
-        <div class="info">${esc(se.zender.info)}${s.ronde ? " · Ronde " + s.ronde : ""}${s.notitie ? "<br>ℹ️ " + esc(s.notitie) : ""}</div>
+        <div class="tv">📺 ${esc(zd(se).kort)}</div>
+        <div class="info">${esc(zd(se).info)}${s.ronde ? " · Ronde " + s.ronde : ""}${s.notitie ? "<br>ℹ️ " + esc(s.notitie) : ""}</div>
       </div></div>`;
   }
 
@@ -248,7 +262,7 @@
       const se = DATA.series[nextRace.serie];
       html += `<div class="next"><small>Volgende race</small>
         <b>${esc(se.naam)} · ${esc(nextRace.sessie)} – ${esc(nextRace.evenement)}</b>
-        <span class="cd">over ${countdown(nextRace.st - now)}</span> · ${relDay(nextRace.st).toLowerCase()} ${fTime.format(nextRace.st)} · 📺 ${esc(se.zender.kort)}</div>`;
+        <span class="cd">over ${countdown(nextRace.st - now)}</span> · ${relDay(nextRace.st).toLowerCase()} ${fTime.format(nextRace.st)} · 📺 ${esc(zd(se).kort)}</div>`;
     }
     if (!list.length) html += `<div class="empty">Geen sessies voor deze selectie.</div>`;
     let cur = null, buf = "", count = 0, truncated = false;
@@ -293,8 +307,10 @@
     };
     const item = (title, sub, p) => `<div class="sub"><span>${esc(title)}<small>${esc(sub)}</small></span>
       <span><button class="copy" data-url="${new URL(p, base).href}">kopieer</button> <a href="${link(p, "Racekalender – " + title)}"${platform === "apple" ? "" : ' target="_blank" rel="noopener"'}>Abonneer</a></span></div>`;
-    let h = item("Alles", "alle series en sessies", "alles.ics") + item("Alleen races", "races, sprints en raceweekenden", "races.ics");
-    for (const [k, s] of Object.entries(DATA.series)) if (s.ics) h += item(s.naam, "📺 " + s.zender.kort, s.ics);
+    const be = land === "be", suf = be ? "-be" : "";
+    let h = `<p>Zenders voor <b>${be ? "België" : "Nederland"}</b> – wissel met de knop ${be ? "BE" : "NL"} bovenin.</p>`;
+    h += item("Alles", "alle series en sessies", `alles${suf}.ics`) + item("Alleen races", "races, sprints en raceweekenden", `races${suf}.ics`);
+    for (const [k, s] of Object.entries(DATA.series)) { const f = be ? s.ics_be : s.ics; if (f) h += item(s.naam, "📺 " + zd(s).kort, f); }
     $("#subs").innerHTML = h;
   }
 
@@ -306,6 +322,7 @@
     else if (t.id === "past") { showPast = !showPast; render(); }
     else if (t.id === "more") { showAll = true; render(); }
     else if (t.matches("#plat button")) { platform = t.dataset.p; store.set("platform", platform); renderSubs(); }
+    else if (t.id === "btnLand") { land = land === "be" ? "nl" : "be"; store.set("land", land); zetLand(); render(); }
     else if (t.id === "btnSub") { renderSubs(); $("#sheet").classList.add("on"); }
     else if (t.id === "close") $("#sheet").classList.remove("on");
     else if (t.matches(".copy")) { navigator.clipboard?.writeText(t.dataset.url).then(() => { t.textContent = "gekopieerd ✓"; }, () => {}); }
@@ -313,7 +330,7 @@
   });
   $("#sheet").addEventListener("click", e => { if (e.target.id === "sheet") e.target.classList.remove("on"); });
 
-  function load(d) { DATA = d; DATA.sessies = d.sessies.map(parse); render(); setInterval(render, 60000); }
+  function load(d) { zetLand(); DATA = d; DATA.sessies = d.sessies.map(parse); render(); setInterval(render, 60000); }
   if (window.__RACEDATA__) load(window.__RACEDATA__);
   else fetch("races.json", { cache: "no-cache" }).then(r => { if (!r.ok) throw 0; return r.json(); })
     .catch(() => fetch(SITE + "races.json", { cache: "no-cache" }).then(r => r.json())).then(load)
