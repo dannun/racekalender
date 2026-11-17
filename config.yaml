@@ -34,6 +34,7 @@ zenders:
   eurosport:   { kort: Eurosport / FIA WEC+, info: "Eurosport (ook via HBO Max met Sport add-on) of de eigen streamingdienst FIA WEC+" }
   youtube_gt:  { kort: GT World (YouTube), info: "Gratis livestream op het GT World YouTube-kanaal" }
   youtube_elms: { kort: ELMS (YouTube), info: "Gratis livestream op het ELMS YouTube-kanaal" }
+  wsbk:        { kort: Viaplay / SBK VideoPass, info: "Viaplay (Viaplay TV+ / Viaplay-app) of de WorldSBK VideoPass via worldsbk.com en de WorldSBK-app" }
   rallytv:     { kort: Rally.TV,       info: "Rally.TV (streamingdienst van de WRC)" }
   iracing:     { kort: iRacing,        info: "Officieel iRacing Special Event – meedoen in iRacing. Grote events worden vaak uitgezonden op het iRacing YouTube/Twitch-kanaal." }
   onbekend:    { kort: "zender ?",     info: "Zender onbekend – vul aan in config.yaml" }
@@ -106,7 +107,7 @@ series:
   wsbk:
     naam: WorldSBK
     kleur: "#7a1fa2"
-    zender: onbekend         # ?
+    zender: wsbk             # ✔ (Viaplay heeft de NL-rechten in 2026)
     bronnen:
       - { type: mst, ics: "https://www.motorsport-total.com/motorsport-termine/termine_superbike-wm.ics" }
   wec:

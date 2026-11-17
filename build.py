@@ -252,6 +252,28 @@ def parse_ics(text: str) -> list[dict]:
     return events
 
 
+LANDEN_NL = {
+    "Australien": "Australië", "Spanien": "Spanje", "Niederlande": "Nederland", "Italien": "Italië",
+    "Frankreich": "Frankrijk", "Tschechien": "Tsjechië", "Ungarn": "Hongarije", "Deutschland": "Duitsland",
+    "Belgien": "België", "Österreich": "Oostenrijk", "Großbritannien": "Groot-Brittannië", "England": "Engeland",
+    "Mexiko-Stadt": "Mexico-Stad", "Mexiko": "Mexico", "Saudi-Arabien": "Saoedi-Arabië", "Brasilien": "Brazilië",
+    "Kanada": "Canada", "Argentinien": "Argentinië", "Schweden": "Zweden", "Finnland": "Finland",
+    "Griechenland": "Griekenland", "Kroatien": "Kroatië", "Lettland": "Letland", "Neuseeland": "Nieuw-Zeeland",
+    "Südafrika": "Zuid-Afrika", "Indonesien": "Indonesië", "Türkei": "Turkije", "Katar": "Qatar",
+    "Bahrain": "Bahrein", "Aserbaidschan": "Azerbeidzjan", "Singapur": "Singapore", "Malaysia": "Maleisië",
+    "Thailand": "Thailand", "Japan": "Japan", "China": "China", "Indien": "India", "Portugal": "Portugal",
+    "Rumänien": "Roemenië", "Polen": "Polen", "Estland": "Estland", "Kenia": "Kenia", "Chile": "Chili",
+    "Paraguay": "Paraguay", "Marokko": "Marokko", "Monaco": "Monaco", "Schweiz": "Zwitserland",
+    "Vereinigte Arabische Emirate": "VAE", "Abu Dhabi": "Abu Dhabi", "Nürburgring": "Nürburgring",
+}
+
+
+def nl_land(t: str) -> str:
+    for de, nl in LANDEN_NL.items():
+        t = re.sub(rf"\b{re.escape(de)}\b", nl, t)
+    return t
+
+
 def mst_discover(f: Fetcher, pagina: str) -> str | None:
     """Zoekt via de kalenderpagina van een serie de .ics-link op motorsport-total.com."""
     html = f.get(f"{MST}/{pagina}/termin-kalender")
@@ -294,8 +316,14 @@ def src_ics(f: Fetcher, serie: str, src: dict, years: list[int], tz: ZoneInfo) -
                 continue
         if "DTSTART" not in ev:
             continue
-        # "Formel 2: Bahrain / Sakhir"  ->  "Bahrain / Sakhir"
-        name = summ.split(":", 1)[1].strip() if ":" in summ else summ
+        # "Formel 2: Bahrain / Sakhir"  ->  "Bahrein / Sakhir"
+        name = nl_land(summ.split(":", 1)[1].strip() if ":" in summ else summ)
+        loc = ev.get("LOCATION", "")
+        if ":" in loc:                                  # "Superbike-WM: Australien / Phillip Island, Phillip Island"
+            loc = loc.split(":", 1)[1].split(",")[-1].strip()
+        if loc and loc.lower() in name.lower():       # plaats staat al in de naam
+            loc = ""
+        ev["LOCATION"] = nl_land(loc)
         s, allday = ev["DTSTART"]
         e = ev.get("DTEND", (None, allday))[0]
         if isinstance(s, datetime):
