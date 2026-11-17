@@ -38,7 +38,7 @@ zenders:
   rallytv:     { kort: Rally.TV,       info: "Rally.TV (streamingdienst van de WRC)" }
   iracing:     { kort: iRacing,        info: "Officieel iRacing Special Event – meedoen in iRacing. Grote events worden vaak uitgezonden op het iRacing YouTube/Twitch-kanaal." }
   # ── België ──
-  be_playsports:   { kort: Play Sports / Tipik, info: "Play Sports (Telenet, Nederlandstalig) of RTBF Tipik / Auvio (Franstalig, gratis). Ook F1 TV Pro." }
+  be_playsports:   { kort: Play Sports / Tipik / F1 TV, info: "Play Sports (Telenet, Nederlandstalig), RTBF Tipik / Auvio (Franstalig, gratis) of F1 TV Pro" }
   be_playsports2:  { kort: Play Sports / F1 TV, info: "Play Sports (Telenet) of F1 TV Pro" }
   be_motogp:       { kort: Play Sports / Tipik, info: "Play Sports (Telenet, Nederlandstalig) of RTBF Tipik / Auvio (Franstalig, gratis)" }
   be_fe:           { kort: Play Sports / Eurosport, info: "Play Sports (Telenet) of Eurosport / HBO Max" }
