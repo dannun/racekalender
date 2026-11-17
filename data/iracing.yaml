@@ -1,0 +1,74 @@
+# iRacing Special Events – details per event (bron: https://www.iracing.com/specialevents/
+# en de wekelijkse iRacing-nieuwsberichten). Het script leest de datums automatisch van
+# iracing.com en vult ze aan met wat hier staat (gekoppeld op naam of startdatum).
+# Events die hier staan maar niet op de site, komen er ook in.
+#
+# Velden per event:
+#   naam, van, tot          verplicht (JJJJ-MM-DD)
+#   circuit                 optioneel
+#   klassen                 optioneel, bijv. "GT3 · GT4"
+#   duur                    racelengte, bijv. 4h / 12h (voor de eindtijd)
+#   slots                   starttijden van de timeslots in UTC/GMT ("2026-12-18T22:00Z")
+#   super_session           starttijd van de Super Session (UTC/GMT)
+#   sessies                 losse sessies: [{ naam, tijd (UTC), klassen?, duur? }]
+#   periode                 naam voor een meerdaags item naast de sessies, bijv. "Kwalificatieraces"
+#   notitie                 komt in de agenda-notitie, bijv. "tijden verwacht, nog niet bevestigd"
+#
+# Vul de 2027-kalender aan zodra iRacing die publiceert (meestal in december).
+events:
+  - naam: SCCA Runoffs
+    van: 2026-11-17
+    tot: 2026-11-21
+    circuit: Road America
+    klassen: Formula Vee · Spec Racer Ford · MX-5 · USF2000 · GT4 · Renault Clio
+    periode: Kwalificatieraces
+    notitie: "Road America Full Course · licentie Rookie 4.0+. Kwalificatieraces vanaf dinsdagavond (VS-tijd); finale in twee Super Sessions (3 min warm-up, 8 min kwalificatie, 35 min race)."
+    duur: 46m
+    sessies:
+      - { naam: "Formula Vee · Super Session 1", tijd: 2026-11-21T15:00Z, klassen: "Formula Vee (Classic, Conqueror, Sabre)" }
+      - { naam: "Spec Racer Ford · Super Session 1", tijd: 2026-11-21T16:00Z, klassen: "Spec Racer Ford" }
+      - { naam: "Mazda MX-5 · Super Session 1", tijd: 2026-11-21T17:00Z, klassen: "Global MX-5 Spec Miata" }
+      - { naam: "USF2000 · Super Session 1", tijd: 2026-11-21T18:00Z, klassen: "USF2000" }
+      - { naam: "GT4 · Super Session 1", tijd: 2026-11-21T19:00Z, klassen: "GT4 (Aston Martin, BMW M4 G82 Evo, Mustang, McLaren 570S, Mercedes-AMG, Porsche 718)" }
+      - { naam: "Renault Clio · Super Session 1", tijd: 2026-11-21T20:00Z, klassen: "Renault Clio" }
+      - { naam: "Formula Vee · Super Session 2", tijd: 2026-11-22T02:00Z, klassen: "Formula Vee (Classic, Conqueror, Sabre)" }
+      - { naam: "Spec Racer Ford · Super Session 2", tijd: 2026-11-22T03:00Z, klassen: "Spec Racer Ford" }
+      - { naam: "Mazda MX-5 · Super Session 2", tijd: 2026-11-22T04:00Z, klassen: "Global MX-5 Spec Miata" }
+      - { naam: "USF2000 · Super Session 2", tijd: 2026-11-22T05:00Z, klassen: "USF2000" }
+      - { naam: "GT4 · Super Session 2", tijd: 2026-11-22T06:00Z, klassen: "GT4 (Aston Martin, BMW M4 G82 Evo, Mustang, McLaren 570S, Mercedes-AMG, Porsche 718)" }
+      - { naam: "Renault Clio · Super Session 2", tijd: 2026-11-22T07:00Z, klassen: "Renault Clio" }
+
+  - naam: 992 Endurance Cup
+    van: 2026-11-27
+    tot: 2026-11-29
+    circuit: Spa-Francorchamps
+    klassen: Porsche 911 Cup (992.2)
+    duur: 12h
+    slots: [2026-11-27T22:00Z, 2026-11-28T07:00Z, 2026-11-28T12:00Z, 2026-11-28T16:00Z, 2026-11-29T00:00Z]
+    notitie: "Standaard special-event-slots (iRacing noemt geen exacte tijden) – controleer vóór het event."
+
+  - naam: Winter Derby
+    van: 2026-12-02
+    tot: 2026-12-07
+    circuit: Five Flags Speedway
+    klassen: Super Late Model
+    notitie: "Tijden nog niet gepubliceerd."
+
+  - naam: Chili Bowl
+    van: 2026-12-15
+    tot: 2026-12-20
+    circuit: Tulsa Expo
+    klassen: Dirt Midget
+    super_session: 2026-12-20T02:00Z
+    notitie: "Super Session verwacht op zaterdag 21:00 ET (zoals in 2025) – nog niet bevestigd."
+
+  - naam: THE Production Car Challenge @ VIR
+    van: 2026-12-18
+    tot: 2026-12-19
+    circuit: VIR Grand Course
+    klassen: Production Car Challenge (solo of team)
+    duur: 4h
+    slots: [2026-12-18T22:00Z, 2026-12-19T07:00Z, 2026-12-19T12:00Z, 2026-12-19T16:00Z, 2026-12-20T00:00Z]
+    notitie: "Slots zoals in 2024 en 2025 – nog niet bevestigd voor 2026."
+
+  # - { naam: Dale Jr Charity Event, van: ?, tot: ? }   # datum nog niet bekend

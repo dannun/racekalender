@@ -1,0 +1,202 @@
+# ─────────────────────────────────────────────────────────────
+#  Racekalender – configuratie
+#  Pas hier series, zenders en meldingen aan. Daarna opnieuw bouwen.
+# ─────────────────────────────────────────────────────────────
+
+titel: Racekalender
+tijdzone: Europe/Amsterdam
+
+# Hoeveel dagen terug blijven afgelopen sessies in de feed staan
+historie_dagen: 30
+
+# Titel van elk agenda-item. Beschikbaar: {serie} {sessie} {evenement} {zender}
+titel_formaat: "{serie} · {sessie} · {evenement} [{zender}]"
+
+# Standaard meldingen (minuten vóór de start) per type sessie.
+# Lege lijst = geen melding. iOS toont meldingen van geabonneerde agenda's
+# alleen als 'Meldingen' voor die agenda aan staat.
+meldingen:
+  race: [30]
+  sprint: [15]
+  kwalificatie: [10]
+  training: []
+  weekend: []        # raceweekenden zonder sessietijden
+
+# ─────────────────────────────────────────────────────────────
+#  Zenders (Nederland). 'kort' komt in de titel, 'info' in de notitie.
+#  ✔ = nagekeken in november 2026, ? = graag zelf even controleren
+# ─────────────────────────────────────────────────────────────
+zenders:
+  viaplay:     { kort: Viaplay / F1 TV, info: "Viaplay TV+ (Ziggo 432, KPN 230, Odido 130) of Viaplay-app. Sommige sessies gratis op Viaplay TV (Ziggo 13, KPN 51, Odido 13). Ook live via F1 TV Pro." }
+  viaplay_f2:  { kort: Viaplay/F1 TV,  info: "Viaplay-app / Viaplay TV+ of F1 TV Pro" }
+  viaplay_n24: { kort: Viaplay,        info: "Viaplay TV+ (Ziggo 432, KPN 230, Odido 130), Viaplay-app; delen gratis op Viaplay TV (Ziggo 13, KPN 51, Odido 13)" }
+  ziggo:       { kort: Ziggo Sport,    info: "Ziggo Sport (Ziggo 14, KPN 233, Odido 160) of Ziggo Sport 2–6 met Ziggo Sport Totaal / Ziggo Sport-app" }
+  eurosport:   { kort: Eurosport / FIA WEC+, info: "Eurosport (ook via HBO Max met Sport add-on) of de eigen streamingdienst FIA WEC+" }
+  youtube_gt:  { kort: GT World (YouTube), info: "Gratis livestream op het GT World YouTube-kanaal" }
+  youtube_elms: { kort: ELMS (YouTube), info: "Gratis livestream op het ELMS YouTube-kanaal" }
+  rallytv:     { kort: Rally.TV,       info: "Rally.TV (streamingdienst van de WRC)" }
+  iracing:     { kort: iRacing,        info: "Sim racing – meedoen in iRacing. Grote events worden vaak uitgezonden op het iRacing YouTube/Twitch-kanaal." }
+  onbekend:    { kort: "zender ?",     info: "Zender onbekend – vul aan in config.yaml" }
+
+# ─────────────────────────────────────────────────────────────
+#  Series
+#  bronnen: in volgorde van voorkeur. Per seizoen (jaar) wordt de eerste
+#  bron gebruikt die voor dat jaar sessies heeft. Zo vult een bron met alleen
+#  raceweekenden (motorsport-total) een jaar waarvoor nog geen tijden bekend zijn.
+#
+#  Brontypes:
+#   sportstimes  – f1calendar.com e.a. (sessietijden)  sleutel: f1, f2, f3, fe, indycar, motogp, f1-academy
+#   motorcal     – motorcal.wetzler.dev (sessietijden)   sleutel: wec, imsa, indycar, f1
+#   mst          – motorsport-total.com agenda (alleen raceweekenden)
+#                  'pagina' = serie-pad op motorsport-total.com, of geef direct 'ics'
+#                  'prefix' = filter op begin van de titel (bij verzamel-agenda's)
+#   ics          – willekeurige .ics-URL           'url'
+# ─────────────────────────────────────────────────────────────
+series:
+  f1:
+    naam: F1
+    kleur: "#e10600"
+    zender: viaplay          # ✔
+    bronnen:
+      - { type: sportstimes, sleutel: f1 }
+      - { type: motorcal, sleutel: f1 }
+  f2:
+    naam: F2
+    kleur: "#0090d0"
+    zender: viaplay_f2       # ?
+    bronnen:
+      - { type: sportstimes, sleutel: f2 }
+      - { type: mst, ics: "https://www.motorsport-total.com/motorsport-termine/termine_formelsport.ics", prefix: "Formel 2" }
+  f3:
+    naam: F3
+    kleur: "#e46c0a"
+    zender: viaplay_f2       # ?
+    bronnen:
+      - { type: sportstimes, sleutel: f3 }
+      - { type: mst, ics: "https://www.motorsport-total.com/motorsport-termine/termine_formelsport.ics", prefix: "Formel 3" }
+  f1a:
+    naam: F1 Academy
+    kleur: "#d4479b"
+    zender: viaplay_f2       # ?
+    aan: false               # zet op true om mee te nemen
+    bronnen:
+      - { type: sportstimes, sleutel: f1-academy }
+      - { type: mst, ics: "https://www.motorsport-total.com/motorsport-termine/termine_formelsport.ics", prefix: "F1-Academy" }
+  motogp:
+    naam: MotoGP
+    kleur: "#c80815"
+    zender: ziggo            # ✔ (ook Moto2/Moto3, t/m 2029)
+    bronnen:
+      - { type: sportstimes, sleutel: motogp }
+      - { type: mst, pagina: motogp }
+  moto2:
+    naam: Moto2
+    kleur: "#8c1d18"
+    zender: ziggo            # ✔
+    aan: false               # zelfde weekenden als MotoGP, bron heeft geen sessietijden
+    bronnen:
+      - { type: mst, pagina: moto2 }
+  moto3:
+    naam: Moto3
+    kleur: "#a83a2f"
+    zender: ziggo            # ✔
+    aan: false               # zelfde weekenden als MotoGP, bron heeft geen sessietijden
+    bronnen:
+      - { type: mst, pagina: moto3 }
+  wsbk:
+    naam: WorldSBK
+    kleur: "#7a1fa2"
+    zender: onbekend         # ?
+    bronnen:
+      - { type: mst, ics: "https://www.motorsport-total.com/motorsport-termine/termine_superbike-wm.ics" }
+  wec:
+    naam: WEC
+    kleur: "#1f4e9e"
+    zender: eurosport        # ✔ (Le Mans volgens Ziggo.nl)
+    bronnen:
+      - { type: motorcal, sleutel: wec }
+      - { type: mst, pagina: wec }
+  elms:
+    naam: ELMS
+    kleur: "#2a7d8c"
+    zender: youtube_elms     # ?
+    bronnen:
+      - { type: mst, pagina: european-le-mans-series }
+  n24:
+    naam: 24h Nürburgring
+    kleur: "#3c8d2f"
+    zender: viaplay_n24      # ✔
+    bronnen:
+      - { type: mst, pagina: 24-stunden-vom-nuerburgring }
+  imsa:
+    naam: IMSA
+    kleur: "#4b6b8a"
+    zender: ziggo            # ✔ (t/m 2027)
+    bronnen:
+      - { type: motorcal, sleutel: imsa }
+  gtwc:
+    naam: GTWC
+    kleur: "#d9a400"
+    zender: youtube_gt       # ?
+    bronnen:
+      - { type: mst, pagina: gt-world-challenge }
+  indycar:
+    naam: IndyCar
+    kleur: "#1b3d8f"
+    zender: ziggo            # ✔ (t/m 2029)
+    bronnen:
+      - { type: sportstimes, sleutel: indycar }
+      - { type: motorcal, sleutel: indycar }
+  nascar:
+    naam: NASCAR
+    kleur: "#ffd200"
+    zender: ziggo            # ✔ (t/m 2029)
+    bronnen:
+      - { type: mst, pagina: nascar }
+  fe:
+    naam: Formula E
+    kleur: "#00a3e0"
+    zender: ziggo            # ✔
+    bronnen:
+      - { type: sportstimes, sleutel: fe }
+      - { type: mst, ics: "https://www.motorsport-total.com/motorsport-termine/termine_formelsport.ics", prefix: "Formel E" }
+  dtm:
+    naam: DTM
+    kleur: "#b0b7bf"
+    zender: ziggo            # ✔
+    bronnen:
+      - { type: mst, pagina: dtm }
+  wrc:
+    naam: WRC
+    kleur: "#ef7d00"
+    zender: rallytv          # ?
+    bronnen:
+      - { type: mst, pagina: wrc }
+  iracing:
+    naam: iRacing
+    kleur: "#0a3d8f"
+    zender: iracing
+    bronnen:
+      # datums automatisch van iracing.com, aangevuld met klassen/tijden uit data/iracing.yaml
+      - { type: iracing, url: "https://www.iracing.com/specialevents/", bestand: data/iracing.yaml }
+
+# ─────────────────────────────────────────────────────────────
+#  Discord (discord_post.py) – webhook-URL staat NIET hier maar in het
+#  GitHub-secret DISCORD_WEBHOOK_URL
+# ─────────────────────────────────────────────────────────────
+discord:
+  naam: Racekalender                 # afzendernaam in Discord
+  kop_week: "🏁 **Races deze week**"
+  kop_dag: "🏁 **Races vandaag**"
+  link: ""                           # optioneel: URL van je web-app onder de kop
+  kleur: "#ff3b30"
+  categorieen: [race, sprint, kwalificatie, weekend]   # voeg 'training' toe voor alles
+  series: []                         # leeg = alle series; anders bijv. [f1, motogp, wec]
+  # Evenementen-lijst van de server (discord_events.py, vereist bot-token)
+  evenementen:
+    categorieen: [race, sprint]      # voeg 'kwalificatie' toe als je die ook wilt
+    dagen_vooruit: 14
+    max: 60                          # Discord staat max. 100 geplande evenementen per server toe
+    series: []                       # leeg = alle series
+    uitsluiten: [iracing]            # iRacing heeft 5 slots per event: haal weg als je die ook als evenement wilt
+    titel_formaat: "{serie} · {sessie} · {evenement}"
