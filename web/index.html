@@ -149,6 +149,8 @@
     #btnSub { font-size: 12px; padding: 8px 10px; }
     #btnLand { padding: 7px 9px; margin-right: 0; }
   }
+  .sub.mijn { border: 1px solid var(--accent); padding: 10px; margin-bottom: 8px; }
+  .sub.mijn small + small { opacity: .7; }
 </style>
 </head>
 <body>
@@ -284,7 +286,8 @@
   }
   let showAll = false;
 
-  const SITE = "https://dannun.github.io/racekalender/";   // adres van de site, voor als de pagina los geopend wordt
+  const SITE = "https://dannun.github.io/racekalender/";     // adres van de site, voor als de pagina los geopend wordt
+  const WORKER = "https://racekalender.dannun.workers.dev/"; // Cloudflare Worker voor 'Mijn agenda' – leeg = verbergen
   let platform = store.get("platform", /android/i.test(navigator.userAgent) ? "google" : /windows/i.test(navigator.userAgent) ? "outlook" : "apple");
   const UITLEG = {
     apple: "Tik op Abonneer: je iPhone of Mac voegt de agenda toe en werkt hem automatisch bij. Meldingen zet je per agenda aan in de Agenda-app.",
@@ -309,6 +312,15 @@
       <span><button class="copy" data-url="${new URL(p, base).href}">kopieer</button> <a href="${link(p, "Racekalender – " + title)}"${platform === "apple" ? "" : ' target="_blank" rel="noopener"'}>Abonneer</a></span></div>`;
     const be = land === "be", suf = be ? "-be" : "";
     let h = `<p>Zenders voor <b>${be ? "België" : "Nederland"}</b> – wissel met de knop ${be ? "BE" : "NL"} bovenin.</p>`;
+    if (WORKER) {
+      const gekozen = Object.keys(DATA.series).filter(k => !hidden.has(k));
+      const q = new URLSearchParams({ series: gekozen.join(","), soort: filter, land });
+      const mijn = WORKER.replace(/\/?$/, "/") + "mijn.ics?" + q.toString();
+      const namen = gekozen.map(k => DATA.series[k].naam).join(", ");
+      const soortTxt = { alles: "alle sessies", kwali: "kwalificatie + races", races: "alleen races" }[filter];
+      h += `<div class="sub mijn"><span>⭐ Mijn agenda<small>${esc(namen)} · ${soortTxt}</small><small>Pas aan met de seriefilters en de knoppen Alles / Kwali / Races.</small></span>
+        <span><button class="copy" data-url="${esc(mijn)}">kopieer</button> <a href="${esc(link(mijn, "Mijn Racekalender"))}"${platform === "apple" ? "" : ' target="_blank" rel="noopener"'}>Abonneer</a></span></div>`;
+    }
     h += item("Alles", "alle series en sessies", `alles${suf}.ics`) + item("Alleen races", "races, sprints en raceweekenden", `races${suf}.ics`);
     for (const [k, s] of Object.entries(DATA.series)) { const f = be ? s.ics_be : s.ics; if (f) h += item(s.naam, "📺 " + zd(s).kort, f); }
     $("#subs").innerHTML = h;
